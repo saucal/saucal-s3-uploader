@@ -1,0 +1,19 @@
+{
+    "name": "saucal/s3-uploader",
+    "autoload": {
+        "psr-4": {
+            "Saucal\\S3Uploader\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Kostas Seressiotis",
+            "email": "kostas@saucal.com"
+        }
+    ],
+    "bin": ["bin/s3-uploader"],
+    "require": {
+        "async-aws/simple-s3": "^1.1",
+        "vlucas/phpdotenv": "^5.4"
+    }
+}

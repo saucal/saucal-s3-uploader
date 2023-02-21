@@ -1,0 +1,53 @@
+#!/usr/bin/env php
+<?php
+/**
+ * A simple command line tool to upload files to S3.
+ */
+
+use AsyncAws\SimpleS3\SimpleS3Client;
+
+global $_composer_autoload_path;
+global $argv;
+
+$composer_autoload_path = $_composer_autoload_path ?? __DIR__ . '/../vendor/autoload.php';
+
+if ( is_file( $composer_autoload_path ) === true ) {
+	require_once $composer_autoload_path;
+} else {
+	die( 'Autoloader not found. Please run "composer install".' . PHP_EOL );
+}
+
+$dotenv = \Dotenv\Dotenv::createImmutable( getcwd() );
+$dotenv->SafeLoad();
+
+if ( ! isset( $_ENV ) || ! isset( $_ENV['AWS_ACCESS_KEY'] ) || ! isset( $_ENV['AWS_SECRET'] ) ) {
+	die( 'Please set AWS_ACCESS_KEY & AWS_SECRET in a .env file.' . PHP_EOL );
+}
+
+$s3 = new SimpleS3Client(
+	array(
+		'accessKeyId'     => $_ENV['AWS_ACCESS_KEY'],
+		'accessKeySecret' => $_ENV['AWS_SECRET'],
+		'region'          => $_ENV['AWS_REGION'] ?? 'us-east-2',
+	)
+);
+
+$bucket = isset( $argv[1] ) ? $argv[1] : false;
+$file   = isset( $argv[2] ) ? $argv[2] : false;
+
+if ( ! $bucket || ! $file ) {
+	die( sprintf( 'Usage: %s target_bucket file_to_upload [target_name]', $argv[0] ) . PHP_EOL );
+}
+
+$target = isset( $argv[3] ) ? $argv[3] : basename( $file );
+
+if ( ! file_exists( $file ) ) {
+	die( sprintf( 'File "%s" does not exist.', $file ) . PHP_EOL );
+}
+
+printf( 'Uploading file "%s" to bucket "%s"' . PHP_EOL, $file, $bucket );
+
+$resource = \fopen( $file, 'r' );
+$s3->upload( $bucket, $target, $resource );
+
+echo 'Done!' . PHP_EOL;
