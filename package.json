@@ -1,0 +1,11 @@
+{
+  "name": "saucal-s3-uploader",
+  "description": "",
+  "version": "1.0.0",
+  "dependencies": {},
+  "scripts": {
+    "postinstall": "composer install --no-dev"
+  },
+  "author": "SAU/CAL",
+  "license": "ISC"
+}
